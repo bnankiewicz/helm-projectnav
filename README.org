@@ -1,0 +1,81 @@
+#+TITLE: helm-projectnav
+
+This package gives ability to jump (or create) between files which are structurally connected. It provides three navigation functions:
+
+- jump to/create alternative file - eg. "Redux/ComponentRedux.js",  "Sagas/ComponentSaga.js", "Components/Component.js", "Components/Styles/Component.css".
+- jump to test file - alternate between tests/implementation
+- jump to component - shows helm dialog with project components grouped by source directory.
+
+* Installation:
+
+** Manual
+
+Install the Helm, dash.el, f.el, and s.el packages.  Then require
+this package in your init file:
+
+#+BEGIN_SRC emacs-lisp
+(require 'helm-projectnav)
+#+END_SRC
+
+* Configuration:
+
+Create .dir-locals.el in project directory and configure variables.
+
+** Configure tests paths
+
+#+BEGIN_SRC emacs-lisp
+(setq helm-projectnav-src-dir "src")
+(setq helm-projectnav-src-suffix ".js")
+(setq helm-projectnav-test-dir "__tests__")
+(setq helm-projectnav-test-suffix ".test.js")
+#+END_SRC
+
+** Configure components directories
+
+(name components-directory-path (paths-with-those-strings-will-be-ignored) component-file-extension)
+
+#+BEGIN_SRC emacs-lisp
+(setq helm-projectnav-components-dirs
+      '(("Components" "App/Components" ("index.js" ".story.js" "Styles" ".md") ".js")
+        ("Containers" "App/Containers" ("index.js" ".md") ".js")
+        ("Sagas" "App/Sagas" ("index.js" ".md") ".js")
+        ("Redux" "App/Redux" ("index.js" ".md") ".js")
+        ("Services" "App/Services" ("index.js" ".md") ".js")
+        ("Navigation" "App/Navigation" ("index.js" ".md") ".js")
+        ("Lib" "App/Lib" ("index.js" ".md") ".js")))
+#+END_SRC
+
+** Configure alternative paths table
+
+(name module-postfix-strip-off path-to-alternative-directory new-postfix ignore-paths-with-this-string)
+
+#+BEGIN_SRC emacs-lisp
+(setq helm-projectnav-alternatives-table
+      '(("Style/Component" "Styles.js" "../" ".js" "Components")
+        ("Component/Styles" ".js" "./Styles/" "Styles.js" "Components")
+        ("Story/Component" ".story.js" "." ".js" "Components" )
+        ("Component/Story" ".js" "." ".story.js" "Components")
+        ("Redux/Saga" "Redux.js" "App/Sagas" "Sagas.js" "")
+        ("Redux/Saga" "Sagas.js" "App/Redux" "Redux.js" "")))
+#+END_SRC
+
+* Usage:
+
+- =helm-projectnav-goto-alternative-file=: Show Helm buffer with alternate files. It's possible to create new file too
+- =helm-projectnav-alternate-between-test-and-implementation=: Toggle between implementation and tests. If tests file doas't exists, it's will be created.
+- =helm-projectnav-components=: Shows list of components in Helm buffer grouped by source directory.
+
+* License:
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
