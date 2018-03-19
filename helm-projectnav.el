@@ -1,4 +1,4 @@
-;;; helm-projectnav.el --- Rifle through your Org files
+;;; helm-projectnav.el
 
 ;; Author: Bartłomiej Nankiewicz <bartlomiej.nankiewicz@gmail.com>
 ;; Url: http://github.com/bnankiewicz/helm-projectnav
