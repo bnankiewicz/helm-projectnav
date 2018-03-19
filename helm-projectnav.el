@@ -132,29 +132,24 @@
   (interactive "P")
   (message "alternatives table: %s" helm-projectnav-alternatives-table)
   (message "file path: %s" file-path)
-  (let ((helm-projectnav-test-file (apply-partially 'helm-projectnav-test-file
-                                                    (file-name-directory file-path)
-                                                    (file-name-nondirectory file-path))))
-    (remove-if-not helm-projectnav-test-file helm-projectnav-alternatives-table)))
+  (let ((helm-projectnav-is-alternative-with (apply-partially 'helm-projectnav-is-alternative-with
+                                                              (file-name-directory file-path)
+                                                              (file-name-nondirectory file-path))))
+    (remove-if-not helm-projectnav-is-alternative-with helm-projectnav-alternatives-table)))
 
-;;;;; Sources
-;;;;; Refile
-
-(defun helm-projectnav-test-file (file-directory file-name alternate-table-row)
-  "docstring"
-  (and (string-suffix-p (nth 1 alternate-table-row) file-name)
-       (s-contains-p (nth 4 alternate-table-row) file-directory)))
-
-
+;;;;; Path
 
 (defun helm-projectnav-is-path-relative (path)
   (s-starts-with-p "." path))
 
 (defun helm-projectnav-get-project-path ()
-  "docstring"
   (locate-dominating-file default-directory ".dir-locals.el"))
 
-;;;;; To alternatives
+;;;;; Alternatives
+
+(defun helm-projectnav-is-alternative-with (file-directory file-name alternate-table-row)
+  (and (string-suffix-p (nth 1 alternate-table-row) file-name)
+       (s-contains-p (nth 4 alternate-table-row) file-directory)))
 
 (defun helm-projectnav-get-alternative-directory (path)
   "docstring"
@@ -167,20 +162,17 @@
   "docstring"
   (let ((project-path (helm-projectnav-get-project-path))
         (filename (file-name-nondirectory file-name) ))
-
     (mapcar
      (lambda (row) (concat
                (helm-projectnav-get-alternative-directory (nth 2 row))
                (replace-regexp-in-string (nth 1 row) (nth 3 row) filename)))
      helm-projectnav-alternatives-table)))
 
-
-
 (defun helm-projectnav-relative-buffer-file-name ()
   "docstring"
   (concat "~/" (file-relative-name (buffer-file-name) (expand-file-name "~"))))
 
-;;;;; To tests
+;;;;; Tests/Source
 
 (defun helm-projectnav-test-path ()
   "docstring"
@@ -214,9 +206,7 @@
           (s-chop-suffix helm-projectnav-test-suffix (s-chop-prefix (helm-projectnav-test-path) (helm-projectnav-relative-buffer-file-name)))
           helm-projectnav-src-suffix))
 
-
-
-;;;;; Components pallette
+;;;;; Components
 
 (defun helm-projectnav-create-components-list (args)
   "docstring"
@@ -224,10 +214,8 @@
   (setq component-files (cdr(cdr (directory-files (concat pp (nth 1 args))))))
   (setq excluded-suffixes (nth 2 args))
   (setq strip-suffix (nth 3 args))
-
   (loop for suffix in excluded-suffixes do
         (setq component-files (remove-if (lambda (file)(s-ends-with-p suffix file)) component-files)))
-
   (mapcar (lambda (file)(s-chop-suffix strip-suffix file)) component-files))
 
 (defun helm-projectnav-goto-component (component-type component-name)
@@ -236,14 +224,11 @@
         (remove-if-not
          (lambda (row) (equal (nth 0 row) component-type))
          helm-projectnav-components-dirs))
-
   (setq component-args (nth 0 component-args))
-
   (find-file (concat (helm-projectnav-get-project-path)
                      (file-name-as-directory (nth 1 component-args) )
                      component-name
                      (nth 3 component-args))))
-
 
 (provide 'helm-projectnav)
 
